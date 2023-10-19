@@ -39,7 +39,7 @@ class InstagramService
         $cursor = 0;
         $result = [];
         try {
-            $url = "https://simpliers.p.rapidapi.com/api/get/instagram/mediaComments?media_id=".$data['url'];
+            $url = "https://simpliers.p.rapidapi.com/api/get/instagram/mediaComments?cursor=0&media_id=".$data['url'];
 
             $curl = curl_init();
             curl_setopt_array($curl, [

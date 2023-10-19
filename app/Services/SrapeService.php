@@ -29,8 +29,10 @@ class SrapeService
             // switch($url->channel->name) {
             //     case 'tiktok':
             if ($url->channel->name == 'tiktok') {
+                Log::info('get tiktok comment');
                 $response = $this->tiktokService->tiktokScrape($url);
             } else if ($url->channel->name == 'instagram') {
+                Log::info('get ig comment');
                 $response = $this->instagramService->instagramScrape($url);
             }
                 // break;

@@ -148,8 +148,8 @@ class TiktokService
 
     private function _postDetail($data)
     {
-        // $url = "https://scraptik.p.rapidapi.com/get-post?aweme_id=".$data['url'];
-        $url = "https://simpliers.p.rapidapi.com/api/get/tiktok/mediaInfo?media_id=".$data['url'];
+        $url = "https://scraptik.p.rapidapi.com/get-post?aweme_id=".$data['url'];
+        // $url = "https://simpliers.p.rapidapi.com/api/get/tiktok/mediaInfo?media_id=".$data['url'];
         try {
             $curl = curl_init();
     
@@ -163,7 +163,7 @@ class TiktokService
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => "GET",
                 CURLOPT_HTTPHEADER => [
-                    "X-RapidAPI-Host: simpliers.p.rapidapi.com",
+                    "X-RapidAPI-Host: scraptik.p.rapidapi.com",
                     "X-RapidAPI-Key: ".env('API_ID_KEY')
                 ],
             ]);
@@ -201,20 +201,20 @@ class TiktokService
         Log::info($response);
         $source = CampaignSource::where('id', $data['id'])->first();
         if (isset($res)) {
-            $creator = Creator::where(['username' =>  $res->owner->username, 'channel_id' => 1])->first();
+            $creator = Creator::where(['username' =>  $res->aweme_detail->author->unique_id, 'channel_id' => 1])->first();
             if (!$creator) {
-                $creator = $this->register($res->owner->username, 1);
+                $creator = $this->register($res->aweme_detail->author->unique_id, 1);
             }
             if ($creator) $source->creator_id = $creator->id;
-            $source->comment_count = $res->comments_count;
+            $source->comment_count = $res->aweme_detail->statistics->comment_count;
             $source->collect_count = 0;
-            $source->like_count = $res->likes_count;
-            $source->play_count = $res->views_count;
-            $source->share_count = $res->retweet_count ?? 0;
-            $source->other_share_count = $res->quote_count ?? 0;
-            $source->caption = substr($res->caption, 0, 254);
-            $source->thumbnail = $res->preview_url;
-            $source->created_at = \Carbon\Carbon::parse($res->created_at);
+            $source->like_count = $res->aweme_detail->statistics->digg_count;
+            $source->play_count = $res->aweme_detail->statistics->play_count;
+            $source->share_count = $res->aweme_detail->statistics->share_count ?? 0;
+            $source->other_share_count = $res->aweme_detail->statistics->whatsapp_share__count ?? 0;
+            $source->caption = substr($res->aweme_detail->desc, 0, 254);
+            $source->thumbnail = $res->aweme_detail->video->cover->url_list[0];
+            $source->created_at = \Carbon\Carbon::parse($res->aweme_detail->create_time);
         }
         $source->save();
                     
